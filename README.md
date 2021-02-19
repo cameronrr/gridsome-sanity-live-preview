@@ -4,7 +4,8 @@
 
 ## Overview
 
-:warning: **Again, this is rather experimental at the moment. If you can help achieve the goal of this project or have suggestions, awesome.**
+:warning: **Again, this is rather experimental at the moment.**
+**Appreciate any help or suggestions to achieve the goal of this project!**
 
 This plugin aims to provide live previews for Gridsome projects which are using Sanity Studio as a data source.
 
@@ -23,7 +24,26 @@ The concept is simple:
 - Authentication occurs by passing the users cookie/token from their logged in Studio session
 - When the data is returned, then the components $page is updated using the built in reactive setter
 
-The application needs some work though.
+## Status
+
+### What is working
+
+- For simple data types and image assets, the current approach does create a preview as expected.
+- The documentation and notes here are very early, they will be improved over time as the package improves.
+
+### What needs attention
+
+#### Actual 'live' updates
+
+- It would be amazing to implement a listener or an interval for retrieving updates while the page stays open.
+- Currently, it's a small issue, you can just reload. In Sanity, toggle between 'Editor' and 'Web Preview' does a reload anyway.
+
+#### Sanity References
+
+- Data returned from Sanity usually contains references.
+- Gridsome at the data store level does a good job resolving these
+- We need a way to resolve these when querying the Sanity graphql api directly
+- The main issue is with Blocks (block content / portable content)
 
 ## Usage
 
@@ -41,7 +61,8 @@ export default function (Vue, { head, router, isClient }) {
  Vue.use(GridsomeSanityLivePreview, {
     // your chosen query string to trigger 'preview' processing
     previewParam: 'preview',
-    // your graphql endpoint
+    // your graphql endpoint (also replace the 'default' tag if your project is different)
+    // you can run sanity graphql list in your sanity project directory to see this
     graphqlEndpoint: 'https://<projectId>.api.sanity.io/v1/graphql/<dataset>/default',
   })
 
@@ -49,14 +70,7 @@ export default function (Vue, { head, router, isClient }) {
 
 ### Component Setup
 
-Currently, the plugin will process the specified pagePreviewQuery to retrieve new data.
-
-- The alias must match the alias used in your `<page-query>`
-- The $id variable must be included as below. The id will be passed in from query params.
-- Don't expect any 'raw' fields to work. This is the biggest issue with this so far.
-  - '\_rawBody' fields are not available. This is gridsome Data Store specific.
-  - The format which can be retrieved from sanity api directly is in format 'bodyRaw'.
-  - Apart from retrieving raw data, none of the references therein are resolved.
+When visiting a route and the previewParam is present in the query strings, the plugin will attempt to process a graphql query. That query needs to be defined on the component level. You would implement this on a 'page' or 'template'.
 
 ```javascript
 // in your component script tag
@@ -69,13 +83,27 @@ export default {
 };
 ```
 
+- An alias is recommended and it must match the alias used in your `<page-query>`
+- The type must be without 'sanity' prefix i.e. 'sanityPost' will be queried as 'Post' for the preview
+- The $id variable must be included. The id will be passed in from the query params.
+- Don't expect any 'raw' fields to work at the moment. This is the biggest issue so far.
+  - '\_rawBody' fields are not available from sanity. This is gridsome Data Store specific.
+  - The format which can be retrieved from sanity api directly is in the format 'bodyRaw'.
+  - None of the references are resolved, this is usually handled by the gridsome data store layer.
+
+#### Possible Improvement
+
 Another idea to not require specifying a separate page preview query, is to inspect the $page object, and infer the query based on the key structure. It should be possible to build the query based on this.
 
 ### Sanity Studio
 
-You will need to setup the preview pane in your Sanity Studio. Some helpful code is provided in the resources folder.
+You will need to setup the preview pane in your Sanity Studio. You should familiarise yourself with their desk structure builder.
 
-You can read more about the concepts here:
+Some helpful code is provided in the resources folder in this projects [Github repository](https://github.com/cameronrr/gridsome-sanity-live-preview).
+
+You can also just put a url like `http://localhost:8080/blog/my-first-post/?preview&id=ef4cdfab-5bdd-4264-8940-e075d91d0ddf` in your browser to test as long as you retrieve an id to include.
+
+You can read more about the desk structure builder and concepts here:
 
 - [Introduction to Structure Builder](https://www.sanity.io/docs/structure-builder-introduction)
 - [Getting started with Structure Builder](https://www.sanity.io/guides/getting-started-with-structure-builder)

@@ -1,7 +1,7 @@
 /*
 {
     "name": "part:@sanity/desk-tool/structure",
-    "path": "./plugins/deskStructure/index.js"
+    "path": "./deskStructure.js"
 }
 */
 
