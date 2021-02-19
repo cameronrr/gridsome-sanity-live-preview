@@ -2,6 +2,16 @@ import { GraphQLClient } from "graphql-request";
 // import resolveReferences from 'gridsome-source-sanity/src/resolveReferences.js'
 
 /**
+ * The default config, can be overriden by passing values as options to Vue.use()
+ */
+const defaultConfig = {
+  previewParam: "preview",
+  graphqlEndpoint: "",
+  // @todo: allow to only check for preview / handle on certain routes
+  // previewRoutes: [],
+};
+
+/**
  * Checks whether the 'preview' param is present in the current route params.
  * @param {Object} query The query strings object from the route
  * @param {String} param The string which identifies this as a preview (default is 'preview')
@@ -15,13 +25,28 @@ const isPreviewRoute = function isPreviewRoute(query, param) {
 };
 
 /**
- * The default config, can be overriden by passing values as options to Vue.use()
+ * Iterate an object and remove any marks
+ * Also change from format 'bodyRaw' to '_rawBody'
+ * @param {Object} object
  */
-const defaultConfig = {
-  previewParam: "preview",
-  graphqlEndpoint: "",
-  // @todo: allow to only check for preview / handle on certain routes
-  // previewRoutes: [],
+const processBlockContent = (object) => {
+  if (typeof object === "object") {
+    for (var key in object) {
+      if (key === "marks") {
+        object[key] = [];
+      } else if (typeof object[key] === "object") {
+        processBlockContent(object[key]);
+      }
+      if (key.endsWith("Raw") && typeof object[key] === "object") {
+        let newKey = key.substring(0, key.length - 3);
+        newKey = newKey.charAt(0).toUpperCase() + newKey.slice(1);
+        newKey = `_raw${newKey}`;
+        object[newKey] = object[key];
+        delete object[key];
+      }
+    }
+  }
+  return object;
 };
 
 /**
@@ -123,17 +148,21 @@ class SanityLivePreviewPlugin {
                  *
                  */
 
-                Object.keys(response).forEach((item) => {
+                Object.keys(response).forEach((key) => {
                   // if $page has a matching key, we can assign data into it
-                  if (vm.$page[item]) {
+                  if (vm.$page[key]) {
                     console.log(
-                      `SanityLivePreviewPlugin - Applying '${item}' preview data to ${to.path}`
+                      `SanityLivePreviewPlugin - Applying '${key}' preview data to ${to.path}`
                     );
+
+                    // do some data processing / management
+                    // as a quick/intermediate solution we will just remove marks from the raw content
+                    // then, our usual sanitizers shouldn't try to work with unavailable reference data
+                    // this function will also set raw content to format '_rawBody' not 'bodyRaw'
+                    let processedItem = processBlockContent(response[key]);
+
                     // use object.assign to keep any top level keys which weren't in the preview
-                    vm.$page[item] = Object.assign(
-                      vm.$page[item],
-                      response[item]
-                    );
+                    vm.$page[key] = Object.assign(vm.$page[key], processedItem);
                   }
                 });
 
