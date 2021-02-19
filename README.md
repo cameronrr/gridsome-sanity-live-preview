@@ -29,6 +29,9 @@ The concept is simple:
 ### What is working
 
 - For simple data types and image assets, the current approach does create a preview as expected.
+- For block content, I had issues with references in marks. v0.1.6 implemented a halfway workaround.
+  - The marks are stripped and instead any children content (i.e. text) is just rendered plainly.
+  - Annotations work fine, so headings and other basic markup still shows in the preview as expected!
 - The documentation and notes here are very early, they will be improved over time as the package improves.
 
 ### What needs attention
@@ -50,6 +53,7 @@ The concept is simple:
 - Gridsome at the data store level does a good job resolving these
 - We need a way to resolve these when querying the Sanity graphql api directly
 - The main issue is with Blocks (block content / portable content)
+- This will allow in particular serializers on block content to do their thing
 
 ## Usage
 
@@ -89,17 +93,41 @@ export default {
 };
 ```
 
+```vue
+// the corresponding
+<page-query> for reference, which uses the data store rather than sanity api directly
+<page-query>
+query Post($id: ID!) {
+  post: sanityPost(id: $id) {
+    title
+    slug {
+      current
+    }
+    publishedAt
+    mainImage {
+      altText
+      asset {
+        url
+      }
+    }
+    excerpt
+    _rawBody(resolveReferences: { maxDepth: 5 })
+  }
+}
+</page-query>
+```
+
 - An alias is recommended and it must match the alias used in your `<page-query>`
 - The type must be without 'sanity' prefix i.e. 'sanityPost' will be queried as 'Post' for the preview
 - The $id variable must be included. The id will be passed in from the query params.
-- Don't expect any 'raw' fields to work at the moment. This is the biggest issue so far.
+- There is currently limitations for 'raw' fields. See above at status for more information. But note that:
   - '\_rawBody' fields are not available from sanity. This is gridsome Data Store specific.
   - The format which can be retrieved from sanity api directly is in the format 'bodyRaw'.
-  - None of the references are resolved, this is usually handled by the gridsome data store layer.
+  - None of the references are being resolved, this can affect block marks
 
 #### Possible Improvement
 
-Another idea to not require specifying a separate page preview query, is to inspect the $page object, and infer the query based on the key structure. It should be possible to build the query based on this.
+Another idea to not require specifying a separate page preview query, is to inspect the $page object, and infer the query based on the key structure. It might be possible to build the query based on this, at least for basic queries with some assumptions. Specifying the query explicitly on the component would be safer especially for more advanced queries, even though it is additional maintenance alongside the `<page-query>`.
 
 ### Sanity Studio
 
@@ -131,11 +159,11 @@ You can read more about the desk structure builder and concepts here:
 - For example, your `<page-query>` can specify `(resolveReferences: { maxDepth: 5 })`
 - Retrieving data directly from the graphql endpoint doesn't offer this kind of feature
 - Where is this most problematic? If you want to work with 'raw' data i.e. PortableContent / Blocks
-- The current version hasn't solved this yet.
+- The current version implements a workaround to just ignore marks and render plain text.
 
 ## Todo
 
-Draft Overlay / Stream Updates
+Automatically apply further updates once the preview page is loaded.
 
 - Should be able to setup a listener / watcher, or at worst perhaps a setInterval to refresh the data
 
