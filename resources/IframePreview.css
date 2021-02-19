@@ -4,9 +4,15 @@
 
 .iframeContainer iframe {
   border: 0;
-  height: 100%;
+  height: calc(100% - 40px);
   left: 0;
+  top: 40px;
   position: absolute;
-  top: 10;
   width: 100%;
+}
+
+.urlBar {
+  color: gray;
+  text-align: center;
+  font-size: 75%;
 }

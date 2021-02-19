@@ -55,7 +55,7 @@ class IframePreview extends React.PureComponent {
 
     return (
       <div>
-        <p style={{color: 'gray', textAlign: 'center', fontSize: '75%'}}>{url}</p>
+        <p className={styles.urlBar}>{url}</p>
         <div className={styles.componentWrapper}>
             <div className={styles.iframeContainer}>
             <iframe src={url} frameBorder={'0'} />
