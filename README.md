@@ -97,6 +97,12 @@ Another idea to not require specifying a separate page preview query, is to insp
 
 ### Sanity Studio
 
+#### CORS origins
+
+You will need to set your localhost and published domains as trusted in your project API settings. See [Access Your Data (CORS)](https://www.sanity.io/docs/cors) for more information. This will enable your client-side to make requests to the API. The authentication works by passing on browser credentials (cookie token) which get set when you log into the studio in the browser.
+
+#### Preview Pane
+
 You will need to setup the preview pane in your Sanity Studio. You should familiarise yourself with their desk structure builder.
 
 Some helpful code is provided in the resources folder in this projects [Github repository](https://github.com/cameronrr/gridsome-sanity-live-preview).
