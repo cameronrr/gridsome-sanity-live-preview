@@ -33,6 +33,12 @@ The concept is simple:
 
 ### What needs attention
 
+#### A loading indicator
+
+- As soon as the preview query is matched, so we will begin processing, we should have a loading indicator
+- There can be a second or few between page load and the reactive data update once the query is processed
+- It will be a nicer experience for the user to have a loading indicator, or something else to confirm what's happening
+
 #### Actual 'live' updates
 
 - It would be amazing to implement a listener or an interval for retrieving updates while the page stays open.
