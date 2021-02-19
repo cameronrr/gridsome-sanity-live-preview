@@ -93,10 +93,13 @@ class SanityLivePreviewPlugin {
             client
               .request(sanityPreviewQuery)
               .then((response) => {
-                if (!response) {
+                if (
+                  !response ||
+                  Object.values(response).every((item) => item === null)
+                ) {
                   console.log(
                     `SanityLivePreviewPlugin - No data returned for ${to.path}`,
-                    "Most likely is you are not authenticated. Make sure you log in to the studio in your browser."
+                    "Most likely an authentication issue. Make sure you log in to the studio in your browser."
                   );
                   return false;
                 }
