@@ -36,6 +36,13 @@ The concept is simple:
 
 ### What needs attention
 
+#### Brand New Pages
+
+This refers to pages which aren't in the production build i.e. no route.
+
+- Need to implement client side 'dynamic routing' so that something is rendered.
+- Looking to reuse the same template, but it needs some checks / validations for null $page data on render.
+
 #### A loading indicator
 
 - As soon as the preview query is matched, so we will begin processing, we should have a loading indicator
@@ -93,9 +100,9 @@ export default {
 };
 ```
 
+And for reference, the corresponding <page-query> which uses the data store rather than sanity api directly:
+
 ```vue
-// the corresponding
-<page-query> for reference, which uses the data store rather than sanity api directly
 <page-query>
 query Post($id: ID!) {
   post: sanityPost(id: $id) {
@@ -117,7 +124,7 @@ query Post($id: ID!) {
 </page-query>
 ```
 
-- An alias is recommended and it must match the alias used in your `<page-query>`
+- An alias is required and it must match the alias used in your `<page-query>` (i.e. `post: ` in the example)
 - The type must be without 'sanity' prefix i.e. 'sanityPost' will be queried as 'Post' for the preview
 - The $id variable must be included. The id will be passed in from the query params.
 - There is currently limitations for 'raw' fields. See above at status for more information. But note that:
@@ -128,6 +135,62 @@ query Post($id: ID!) {
 #### Possible Improvement
 
 Another idea to not require specifying a separate page preview query, is to inspect the $page object, and infer the query based on the key structure. It might be possible to build the query based on this, at least for basic queries with some assumptions. Specifying the query explicitly on the component would be safer especially for more advanced queries, even though it is additional maintenance alongside the `<page-query>`.
+
+### Dynamic Routing
+
+- If you only want to show previews for updates to existing pages, there is nothing more to do in Gridsome.
+- If however, you want to be able to show content for a brand new Sanity document which isn't in the production build, you need dynamic routing.
+
+```javascript
+// gridsome.server.js - create dynamic routes to support client side 'preview' pages
+module.exports = function (api) {
+  api.createPages(({ createPage }) => {
+    createPage({
+      path: "/blog/:id",
+      component: "./src/templates/SanityPost.vue",
+      queryVariables: {
+        id: "",
+      },
+    });
+  });
+};
+```
+
+We use this to create a 'shell' with which to assign our client side preview data into. You can reuse your existing templates i.e. `templates/SanityPost.vue` with the following in mind:
+
+- When the dynamic template page is rendered (i.e. `blog/_id.html`) it will complain if it cannot attempt to execute a query to prefill it's data. This is because we are using the same template for proper `<page-query>` exection for known routes, as well as creating it as an empty shell for preview routes.
+
+  - The solution is to include `queryVariables: { id: "" }` in `createPage()`
+
+- If you use overlayDrafts in development mode, you might have noticed that Sanity doesn't do full validations on draft documents. This can result in your template failing, if it tries to reference a null or undefined value. And so it is good practice to validate the data you are trying to use or display. Especially if you want to use the same template for server and client preview page generation.
+  - In your components `<script>` tag, the optional chaining operator is useful to validate the paths exist: i.e. `this.$page.post?.title` and `this.$page.post?.mainImage?.asset.url`.
+  - Until Webpack v5 is in place (think Vue 3 with Gridsome 1.0), we cannot use this approach inside `<template>`. Instead, we can use logical AND operator `&&` like this: `{{ $page.post && $page.post.title }}` to return the right side if the data exists.
+  - If a component has no children and only needs to reference values by binding (i.e. an img tag) then a v-for on the tag will work. This is useful to do once if you have multiple bindings i.e. 'src' and'alt' for an img. This does not seem to stop evaluation of child components or inner html, so you cannot just put a v-for on `<template>` or it's first child. Example: `<img v-if="$page.post && $page.post.mainImage" :src="$page.post.mainImage.asset.url">`.
+
+#### Redirects
+
+If you implemented dynamic routing, Gridsome can [output a redirects array](https://gridsome.org/docs/dynamic-routing/#generating-rewrite-rules) after building to assist with implementation on your hosting.
+
+```javascript
+[{ from: "/blog/:id", to: "/blog/_id.html", status: 200 }];
+```
+
+Here is an example for Netlify.
+
+```javascript
+// gridsome.server.js
+module.exports = function (api) {
+  api.afterBuild(({ redirects }) => {
+    if (redirects) {
+      let rules = [];
+      for (const rule of redirects) {
+        rules.push(`${rule.from}\t${rule.to}\t${rule.status}`);
+      }
+      fs.appendFileSync("./dist/_redirects", rules.join("\n"));
+    }
+  });
+};
+```
 
 ### Sanity Studio
 
