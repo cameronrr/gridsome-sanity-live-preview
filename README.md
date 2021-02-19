@@ -192,6 +192,8 @@ module.exports = function (api) {
 };
 ```
 
+:grey_question: To review ... best practice to redirect to 404 if the dynamic route is actually useless i.e. no preview data or issue retrieving it, then `vm$router.push()` away to 404?
+
 ### Sanity Studio
 
 #### CORS origins
