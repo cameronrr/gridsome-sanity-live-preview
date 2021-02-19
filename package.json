@@ -1,6 +1,6 @@
 {
   "name": "gridsome-sanity-live-preview",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description": "Enable client-side previews for Gridsome and Sanity Studio projects",
   "main": "index.js",
   "scripts": {
