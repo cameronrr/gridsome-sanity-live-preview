@@ -149,8 +149,8 @@ class SanityLivePreviewPlugin {
                  */
 
                 Object.keys(response).forEach((key) => {
-                  // if $page has a matching key, we can assign data into it
-                  if (vm.$page[key]) {
+                  // if $page has a matching key, we can assign data into it (even if it's current value is null)
+                  if (vm.$page.hasOwnProperty(key)) {
                     console.log(
                       `SanityLivePreviewPlugin - Applying '${key}' preview data to ${to.path}`
                     );
