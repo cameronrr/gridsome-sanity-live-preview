@@ -23,13 +23,15 @@ The concept is simple:
 - Authentication occurs by passing the users cookie/token from their logged in Studio session
 - When the data is returned, then the components $page is updated using the built in reactive setter
 
+The application needs some work though.
+
 ## Usage
 
 ### Gridsome Project
 
 This is implemented as a Vue plugin. Import and use in main.js.
 
-**NOTE: NOT YET ON NPM AT TIME OF WRITING.**
+`npm install gridsome-sanity-live-preview`
 
 ```javascript
 // main.js
@@ -91,12 +93,14 @@ You can read more about the concepts here:
 - Where is this most problematic? If you want to work with 'raw' data i.e. PortableContent / Blocks
 - The current version hasn't solved this yet.
 
+## Todo
+
+Draft Overlay / Stream Updates
+
+- Should be able to setup a listener / watcher, or at worst perhaps a setInterval to refresh the data
+
 ## Questions
 
 - Is there a better approach?
 - Is there a way to work with the data store client side i.e. add/update data store documents
 - Can the resolveReferences sanity function be used? It requires the data store context to resolve references
-
-```
-
-```

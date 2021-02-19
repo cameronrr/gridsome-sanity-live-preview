@@ -1,6 +1,6 @@
 {
   "name": "gridsome-sanity-live-preview",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Enable client-side previews for Gridsome and Sanity Studio projects",
   "main": "index.js",
   "scripts": {
@@ -10,7 +10,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": ""
+    "url": "https://github.com/cameronrr/gridsome-sanity-live-preview"
   },
   "dependencies": {
     "graphql-request": "^3.4.0"
