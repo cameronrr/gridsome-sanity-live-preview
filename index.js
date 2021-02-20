@@ -106,9 +106,20 @@ class SanityLivePreviewPlugin {
             const sanityPreviewQuery = !vm.$options.pagePreviewQuery
               ? ""
               : vm.$options.pagePreviewQuery
+                  // strip start and end whitespace
                   .trim()
+                  // insert the id for this document from the query params
                   .replace("$id", `"${sanityParams.id}"`)
+                  // convert gridsome format '_rawBody' to sanity format 'bodyRaw"
+                  // field names can contain letters, numbers and underscores
+                  .replace(
+                    /_raw([a-zA-Z0-9_]*)/g,
+                    (match, p1) =>
+                      `${p1.charAt(0).toLowerCase()}${p1.slice(1)}Raw`
+                  )
+                  // remove extra spaces
                   .replace(/\s\s+/g, " ")
+                  // remove extra line breaks
                   .replace(/[\r\n]+/gm, "");
 
             if (debugOutput) {

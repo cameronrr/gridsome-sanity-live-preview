@@ -41,10 +41,6 @@ The documentation and notes here are very early, they will be improved over time
 
 ### What needs attention
 
-#### Todo
-
-- Since we map bodyRaw back to \_rawBody when the data is retrieved, we could just do the reverse when retrieving data. Then we don't need to specify bodyRaw in the preview query, which is then kinda the only inconsistency with the actual page query. Just specify \_bodyRaw and the plugin can handle that.
-
 #### A loading indicator
 
 - As soon as the preview query is matched, we should show a loading indicator while the data is retrieved.
@@ -98,7 +94,7 @@ When visiting a route and the previewParam is present in the query strings, the 
 export default {
   // ...
   pagePreviewQuery: `{ post: Post(id: $id) {
-      title  publishedAt mainImage { altText asset { url } } excerpt bodyRaw }
+      title  publishedAt mainImage { altText asset { url } } excerpt _rawBody }
   }`,
   // ...
 };
@@ -133,7 +129,7 @@ query Post($id: ID!) {
 - The $id variable must be included. The id will be passed in from the query params.
 - There is currently limitations for 'raw' fields. See above at status for more information. But note that:
   - '\_rawBody' fields are not available from sanity. This is gridsome Data Store specific.
-  - The format which can be retrieved from sanity api directly for previews is in the format 'bodyRaw'.
+  - From v.0.1.11 the plugin will automatically convert format '\_rawBody' to 'bodyRaw' and back again.
   - None of the references are being resolved, this can affect block marks. Marks are currently stripped.
 
 #### Possible Improvement
