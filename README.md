@@ -81,6 +81,8 @@ export default function (Vue, { head, router, isClient }) {
     previewParam: 'preview',
     // your graphql endpoint (also replace the 'default' tag if your project is different)
     graphqlEndpoint: 'https://<projectId>.api.sanity.io/v1/graphql/<dataset>/default',
+    // whether to output the plugins actions to the console. helpful for seeing what's going on.
+    debugOutput: true,
   })
 
 ```

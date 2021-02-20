@@ -7,6 +7,7 @@ import { GraphQLClient } from "graphql-request";
 const defaultConfig = {
   previewParam: "preview",
   graphqlEndpoint: "",
+  debugOutput: false,
   // @todo: allow to only check for preview / handle on certain routes
   // previewRoutes: [],
 };
@@ -60,7 +61,9 @@ class SanityLivePreviewPlugin {
     if (process.isClient) {
       const config = Object.assign(defaultConfig, options);
 
-      console.log("SanityLivePreviewPlugin - Config", config);
+      if (debugOutput) {
+        console.log("SanityLivePreviewPlugin - Config", config);
+      }
 
       // must have endpoint supplied or no point proceeding.
       if (!config.graphqlEndpoint) {
@@ -80,10 +83,12 @@ class SanityLivePreviewPlugin {
         beforeRouteEnter(to, from, next) {
           const sanityParams = isPreviewRoute(to.query, config.previewParam);
 
-          console.log(
-            `SanityLivePreviewPlugin - Sanity Params for ${to.path}`,
-            sanityParams
-          );
+          if (debugOutput) {
+            console.log(
+              `SanityLivePreviewPlugin - Sanity Params for ${to.path}`,
+              sanityParams
+            );
+          }
 
           // otherwise, we will instruct the incoming component to retrieve new preview data
           next((vm) => {
@@ -106,17 +111,23 @@ class SanityLivePreviewPlugin {
                   .replace(/\s\s+/g, " ")
                   .replace(/[\r\n]+/gm, "");
 
-            console.log(
-              `SanityLivePreviewPlugin - Preview Query for ${to.path}`,
-              { previewQuery: sanityPreviewQuery }
-            );
+            if (debugOutput) {
+              console.log(
+                `SanityLivePreviewPlugin - Preview Query for ${to.path}`,
+                { previewQuery: sanityPreviewQuery }
+              );
+            }
 
             // IMPORTANT: the defined preview query must have aliases which match the <page-query>
             // This is because we will update the $page data using their reactive setters of the same name
 
             // if there's no query to be made i.e. no user provided, none generated, then return here
             if (!sanityPreviewQuery) {
-              console.warn("Cannot retrieve query results - no query defined");
+              if (debugOutput) {
+                console.warn(
+                  "Cannot retrieve query results - no query defined"
+                );
+              }
               return false;
             }
 
@@ -134,24 +145,30 @@ class SanityLivePreviewPlugin {
                   !response ||
                   Object.values(response).every((item) => item === null)
                 ) {
-                  console.log(
-                    `SanityLivePreviewPlugin - No data returned for ${to.path}`,
-                    "Most likely an authentication issue. Make sure you log in to the studio in your browser."
-                  );
+                  if (debugOutput) {
+                    console.log(
+                      `SanityLivePreviewPlugin - No data returned for ${to.path}`,
+                      "Most likely an authentication issue. Make sure you log in to the studio in your browser."
+                    );
+                  }
                   return false;
                 }
 
-                console.log(
-                  `SanityLivePreviewPlugin - Query Result for ${to.path}`,
-                  response
-                );
+                if (debugOutput) {
+                  console.log(
+                    `SanityLivePreviewPlugin - Query Result for ${to.path}`,
+                    response
+                  );
+                }
 
                 Object.keys(response).forEach((key) => {
                   // if $page has a matching key, we can assign data into it (even if it's current value is null)
                   if (vm.$page.hasOwnProperty(key)) {
-                    console.log(
-                      `SanityLivePreviewPlugin - Applying '${key}' preview data to ${to.path}`
-                    );
+                    if (debugOutput) {
+                      console.log(
+                        `SanityLivePreviewPlugin - Applying '${key}' preview data to ${to.path}`
+                      );
+                    }
 
                     // do some data processing / management
                     // as a quick/intermediate solution we will just remove marks from the raw content
@@ -167,16 +184,20 @@ class SanityLivePreviewPlugin {
                   }
                 });
 
-                console.log(
-                  `SanityLivePreviewPlugin - Updated $page data for ${to.path}`,
-                  vm.$page
-                );
+                if (debugOutput) {
+                  console.log(
+                    `SanityLivePreviewPlugin - Updated $page data for ${to.path}`,
+                    vm.$page
+                  );
+                }
               })
               .catch((error) => {
-                console.warn(
-                  `SanityLivePreviewPlugin - Error processing query for ${to.path}`,
-                  error
-                );
+                if (debugOutput) {
+                  console.warn(
+                    `SanityLivePreviewPlugin - Error processing query for ${to.path}`,
+                    error
+                  );
+                }
               });
           });
         },
