@@ -91,7 +91,7 @@ class SanityLivePreviewPlugin {
             if (!sanityParams) {
               // we can support dynamic routes being for preview only. go 404 if so and no data
               return vm.$context.previewRouteOnly
-                ? router.replace("/404/")
+                ? vm.$router.replace("/404/")
                 : next();
             }
 
