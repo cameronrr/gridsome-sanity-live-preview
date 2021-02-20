@@ -29,15 +29,20 @@ The concept is simple:
 
 The documentation and notes here are very early, they will be improved over time as the package improves and as it is used by more people.
 
+v0.1.0 was mostly just testing and getting the concept proven. It has worked well for my purposes.
+v0.2.0 is now 'packagerised' with typescript, bundlers and modules properly with cjs / esm / umd imports.
+
 ### What is working
 
-- For simple data types and image assets, the current approach does create a preview as expected.
-- For block content, I had issues with references in marks. v0.1.6 implemented a halfway workaround.
+- For simple data types and image assets, the current approach creates a preview as expected.
+- For block content, there was issues with references in marks. v0.1.6 implemented a halfway workaround.
   - The marks are stripped and instead any children content (i.e. text) is just rendered plainly.
   - Annotations work fine, so headings and other basic markup still shows in the preview as expected!
 - Initially, only non-dynamic routes which already existed in the build were able to be updated.
-- Around v0.1.10, there is support for dynamic client-side 'preview only' routes, to preview brand new docs.
+- Since v0.1.12, there is support for dynamic client-side 'preview only' routes, to preview brand new docs.
   - There is even support to utilise the same template, no separate preview components needed.
+
+This package has certainly met my needs so far for Sanity Studio live previews on a Gridsome deployed static site!
 
 ### What needs attention
 
