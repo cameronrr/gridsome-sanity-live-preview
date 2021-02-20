@@ -1,0 +1,25 @@
+{
+    "compilerOptions": {
+        "module": "esnext",
+        "target": "esnext",
+        "lib": [
+            "esnext",
+            "dom"
+        ],
+        "moduleResolution": "node",
+        "declaration": true,
+        "outDir": "./dist/esm",
+        "sourceMap": true,
+        "allowJs": true,
+        "noImplicitAny": true,
+        "removeComments": true,
+        "strict": true,
+    },
+    "include": [
+        "src/**/*.ts",
+        "src/**/*.tsx",
+    ],
+    "exclude": [
+        "node_modules",
+    ]
+}

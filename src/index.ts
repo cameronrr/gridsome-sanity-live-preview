@@ -18,7 +18,10 @@ const defaultConfig = {
  * @param {String} param The string which identifies this as a preview (default is 'preview')
  * @returns {(Boolean|Object)} False if not a preview or id is missing, otherwise { id, isDraft }
  */
-const isPreviewRoute = function isPreviewRoute(query, param) {
+const isPreviewRoute = function isPreviewRoute(
+  query: Record<string, string>,
+  param: string
+): false | Record<string, string> {
   if (query[param] === null || (query[param] && query[param] != "false")) {
     return query.id ? { id: query.id, isDraft: query.draft } : false;
   }
@@ -30,13 +33,13 @@ const isPreviewRoute = function isPreviewRoute(query, param) {
  * Also change from format 'bodyRaw' to '_rawBody'
  * @param {Object} object
  */
-const processBlockContent = (object) => {
+const processBlockContent = (object: Record<string, unknown>) => {
   if (typeof object === "object") {
     for (var key in object) {
       if (key === "marks") {
         object[key] = [];
       } else if (typeof object[key] === "object") {
-        processBlockContent(object[key]);
+        processBlockContent(object[key] as Record<string, unknown>);
       }
       if (key.endsWith("Raw") && typeof object[key] === "object") {
         let newKey = key.substring(0, key.length - 3);
@@ -56,8 +59,8 @@ const processBlockContent = (object) => {
  *  If found, it will perform a specified preview query to obtain new / draft data.
  */
 class SanityLivePreviewPlugin {
-  install(Vue, options) {
-    // we only need to deal with previews on the client side
+  install(Vue: any, options: Record<string, unknown>) {
+    // @ts-ignore we only need to deal with previews on the client side
     if (process.isClient) {
       const config = Object.assign(defaultConfig, options);
 
@@ -80,7 +83,7 @@ class SanityLivePreviewPlugin {
         }, 
         */
 
-        beforeRouteEnter(to, from, next) {
+        beforeRouteEnter(to: any, from: any, next: any) {
           const sanityParams = isPreviewRoute(to.query, config.previewParam);
 
           if (config.debugOutput) {
@@ -91,7 +94,7 @@ class SanityLivePreviewPlugin {
           }
 
           // otherwise, we will instruct the incoming component to retrieve new preview data
-          next((vm) => {
+          next((vm: any) => {
             // if this route isn't a preview, or we are missing mandatory data (i.e. an id), then return here
             if (!sanityParams) {
               // we can support dynamic routes being for preview only. go 404 if so and no data
@@ -114,7 +117,7 @@ class SanityLivePreviewPlugin {
                   // field names can contain letters, numbers and underscores
                   .replace(
                     /_raw([a-zA-Z0-9_]*)/g,
-                    (match, p1) =>
+                    (match: string, p1: string) =>
                       `${p1.charAt(0).toLowerCase()}${p1.slice(1)}Raw`
                   )
                   // remove extra spaces
@@ -201,6 +204,7 @@ class SanityLivePreviewPlugin {
                     vm.$page
                   );
                 }
+                return true;
               })
               .catch((error) => {
                 if (config.debugOutput) {
@@ -209,11 +213,10 @@ class SanityLivePreviewPlugin {
                     error
                   );
                 }
+                return false;
               });
           });
         },
-
-        methods: {},
       });
     }
   }
