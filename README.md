@@ -41,6 +41,10 @@ The documentation and notes here are very early, they will be improved over time
 
 ### What needs attention
 
+#### Todo
+
+- Since we map bodyRaw back to \_rawBody when the data is retrieved, we could just do the reverse when retrieving data. Then we don't need to specify bodyRaw in the preview query, which is then kinda the only inconsistency with the actual page query. Just specify \_bodyRaw and the plugin can handle that.
+
 #### A loading indicator
 
 - As soon as the preview query is matched, we should show a loading indicator while the data is retrieved.
