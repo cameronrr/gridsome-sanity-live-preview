@@ -100,7 +100,7 @@ export default {
 };
 ```
 
-And for reference, the corresponding <page-query> which uses the data store rather than sanity api directly:
+And for reference, the corresponding `<page-query>` which uses the data store rather than sanity api directly:
 
 ```vue
 <page-query>
@@ -141,6 +141,8 @@ Another idea to not require specifying a separate page preview query, is to insp
 - If you only want to show previews for updates to existing pages, there is nothing more to do in Gridsome.
 - If however, you want to be able to show content for a brand new Sanity document which isn't in the production build, you need dynamic routing.
 
+If you only want this dynamic route for previews, you can set `context: { previewRouteOnly: true }` in which case, the plugin will replace the route with /404/ if the preview query or preview id is not found.
+
 ```javascript
 // gridsome.server.js - create dynamic routes to support client side 'preview' pages
 module.exports = function (api) {
@@ -148,6 +150,9 @@ module.exports = function (api) {
     createPage({
       path: "/blog/:id",
       component: "./src/templates/SanityPost.vue",
+      context: {
+        previewRouteOnly: true,
+      },
       queryVariables: {
         id: "",
       },

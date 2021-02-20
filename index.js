@@ -85,13 +85,16 @@ class SanityLivePreviewPlugin {
             sanityParams
           );
 
-          // if this route isn't a preview, or we are missing mandatory data (i.e. an id), then return here
-          if (!sanityParams) {
-            return next();
-          }
-
           // otherwise, we will instruct the incoming component to retrieve new preview data
           next((vm) => {
+            // if this route isn't a preview, or we are missing mandatory data (i.e. an id), then return here
+            if (!sanityParams) {
+              // we can support dynamic routes being for preview only. go 404 if so and no data
+              return vm.$context.previewRouteOnly
+                ? router.replace("/404/")
+                : next();
+            }
+
             // if the user specifies the preview query to be run, then we will use that
             // another idea is to generate a query by inspecting the keys on the vm.$page object
             // we will expect only one query variable of $id which we will replace with the query string id
@@ -157,7 +160,10 @@ class SanityLivePreviewPlugin {
                     let processedItem = processBlockContent(response[key]);
 
                     // use object.assign to keep any top level keys which weren't in the preview
-                    vm.$page[key] = Object.assign(vm.$page[key] || {}, processedItem);
+                    vm.$page[key] = Object.assign(
+                      vm.$page[key] || {},
+                      processedItem
+                    );
                   }
                 });
 
