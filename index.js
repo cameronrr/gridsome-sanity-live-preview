@@ -68,6 +68,15 @@ class SanityLivePreviewPlugin {
       }
 
       Vue.mixin({
+        /*  
+        mounted() {
+            // Still reviewing $page reactivity where initial page-query returns null
+            // Maybe we can use { parse } from 'graphql' on the pagePreviewQuery
+            // to build the $page object structure for dynamic routes, but it's messy
+            // const pagePreviewQueryFields = parse(this.$options.pagePreviewQuery)
+        }, 
+        */
+
         beforeRouteEnter(to, from, next) {
           const sanityParams = isPreviewRoute(to.query, config.previewParam);
 
@@ -134,20 +143,6 @@ class SanityLivePreviewPlugin {
                   response
                 );
 
-                // with our response, we can assign it directly into $page using its reactive setters
-                // the keys in the response are obejcts for the aliases used in the preview query
-
-                /**
-                 * TO REVIEW
-                 * Resolving references is usually done automatically at the data store layer
-                 * We need to somehow handle this here, or find a way to work with the data store api's from the client
-                 * One idea is to tap into the resolveReferences in gridsome-source-sanity
-                 * However this requires the context of the data store in order to find the references and return its data
-                 *
-                 * const resolvedRaw = resolveReferences(response.bodyRaw, 0, 5)
-                 *
-                 */
-
                 Object.keys(response).forEach((key) => {
                   // if $page has a matching key, we can assign data into it (even if it's current value is null)
                   if (vm.$page.hasOwnProperty(key)) {
@@ -162,7 +157,7 @@ class SanityLivePreviewPlugin {
                     let processedItem = processBlockContent(response[key]);
 
                     // use object.assign to keep any top level keys which weren't in the preview
-                    vm.$page[key] = Object.assign(vm.$page[key], processedItem);
+                    vm.$page[key] = Object.assign(vm.$page[key] || {}, processedItem);
                   }
                 });
 
