@@ -61,7 +61,7 @@ class SanityLivePreviewPlugin {
     if (process.isClient) {
       const config = Object.assign(defaultConfig, options);
 
-      if (debugOutput) {
+      if (config.debugOutput) {
         console.log("SanityLivePreviewPlugin - Config", config);
       }
 
@@ -83,7 +83,7 @@ class SanityLivePreviewPlugin {
         beforeRouteEnter(to, from, next) {
           const sanityParams = isPreviewRoute(to.query, config.previewParam);
 
-          if (debugOutput) {
+          if (config.debugOutput) {
             console.log(
               `SanityLivePreviewPlugin - Sanity Params for ${to.path}`,
               sanityParams
@@ -122,7 +122,7 @@ class SanityLivePreviewPlugin {
                   // remove extra line breaks
                   .replace(/[\r\n]+/gm, "");
 
-            if (debugOutput) {
+            if (config.debugOutput) {
               console.log(
                 `SanityLivePreviewPlugin - Preview Query for ${to.path}`,
                 { previewQuery: sanityPreviewQuery }
@@ -134,7 +134,7 @@ class SanityLivePreviewPlugin {
 
             // if there's no query to be made i.e. no user provided, none generated, then return here
             if (!sanityPreviewQuery) {
-              if (debugOutput) {
+              if (config.debugOutput) {
                 console.warn(
                   "Cannot retrieve query results - no query defined"
                 );
@@ -156,7 +156,7 @@ class SanityLivePreviewPlugin {
                   !response ||
                   Object.values(response).every((item) => item === null)
                 ) {
-                  if (debugOutput) {
+                  if (config.debugOutput) {
                     console.log(
                       `SanityLivePreviewPlugin - No data returned for ${to.path}`,
                       "Most likely an authentication issue. Make sure you log in to the studio in your browser."
@@ -165,7 +165,7 @@ class SanityLivePreviewPlugin {
                   return false;
                 }
 
-                if (debugOutput) {
+                if (config.debugOutput) {
                   console.log(
                     `SanityLivePreviewPlugin - Query Result for ${to.path}`,
                     response
@@ -175,7 +175,7 @@ class SanityLivePreviewPlugin {
                 Object.keys(response).forEach((key) => {
                   // if $page has a matching key, we can assign data into it (even if it's current value is null)
                   if (vm.$page.hasOwnProperty(key)) {
-                    if (debugOutput) {
+                    if (config.debugOutput) {
                       console.log(
                         `SanityLivePreviewPlugin - Applying '${key}' preview data to ${to.path}`
                       );
@@ -195,7 +195,7 @@ class SanityLivePreviewPlugin {
                   }
                 });
 
-                if (debugOutput) {
+                if (config.debugOutput) {
                   console.log(
                     `SanityLivePreviewPlugin - Updated $page data for ${to.path}`,
                     vm.$page
@@ -203,7 +203,7 @@ class SanityLivePreviewPlugin {
                 }
               })
               .catch((error) => {
-                if (debugOutput) {
+                if (config.debugOutput) {
                   console.warn(
                     `SanityLivePreviewPlugin - Error processing query for ${to.path}`,
                     error
