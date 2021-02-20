@@ -91,7 +91,7 @@ class SanityLivePreviewPlugin {
           }
 
           // otherwise, we will instruct the incoming component to retrieve new preview data
-          next(async (vm) => {
+          next((vm) => {
             // if the user specifies the preview query to be run, then we will use that
             // another idea is to generate a query by inspecting the keys on the vm.$page object
             // we will expect only one query variable of $id which we will replace with the query string id
