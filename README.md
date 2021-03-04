@@ -1,6 +1,7 @@
 # gridsome-sanity-live-preview
 
 :warning: **Very new, very early, needs work, polish and love.**
+
 :warning: **But at the same time, it's working very well for my needs.**
 
 ## Overview
